@@ -70,6 +70,8 @@ Note that `Object.freeze()` is shallow: object values within a frozen object (i
 [The MDN entry on `Object.freeze()`][4] provides an example `deepFreeze()`
 implementation that can be used to make objects fully immutable.
 
+There is a proposal to add immutable data structures to a future version of ECMAScript.
+
 ## `const` vs. `let`
 
 The only difference between `const` and `let` is that `const` makes the
@@ -79,8 +81,9 @@ Everything I wrote here so far are facts. What follows is entirely subjective,
 but bear with me.
 
 Given the above, `const` makes code easier to read: within its scope, a `const`
-`let` there is no such guarantee. As a result, it makes sense to use `let` and
-`const` as follows in your ES6 code:
+variable always refers to the same object. With `let` there is no such
+guarantee. As a result, it makes sense to use `let` and `const` as follows in
+your ES6 code:
 
 *   use `const` by default
 *   only use `let` if rebinding is needed

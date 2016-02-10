@@ -1,28 +1,31 @@
-# ES6 const is not about immutability
+# ES6 const не об иммутабельности
 
-This seems to be a very common misconception that just won’t die. I keep
-running into it in blog posts, Twitter discussions, and even books. Here’s my 
-attempt at setting things straight.
+Похоже, это весьма распространённое заблуждение, которое не исчезнет просто
+так. Я натыкаюсь на него в блогах, twitter-обсуждениях и даже книгах. Эта
+статья — моя попытка расставить все точки над i.
 
-## `const` creates an immutable *binding*
+## `const` создаёт неизменяемую связь
 
-ES6 `const` does **not** indicate that a value is ‘constant’ or immutable. A 
-`const` value can definitely change. The following is perfectly valid ES6 code
-that does not throw an exception:
+Ключевое слово `const` **не** означает, что значение является «константой» или
+что оно иммутабельно (неизменяемо). `const`-значение определённо может
+изменяться. Следующий пример — абсолютно валидный ES6-код, не выбрасывающий
+никаких исключений:
 
     const foo = {};
     foo.bar = 42;
     console.log(foo.bar);
     // → 42
 
-The only thing that’s immutable here is the *binding*. `const` assigns a value
-(`{}`) to a variable name (`foo`), and guarantees that no rebinding will happen
-. Using an[assignment operator][1] or a [unary][2] or [postfix][3] `--` or `++`
-`const` variable throws a `TypeError` exception:
+Единственная действительно иммутабельная вещь в этом примере — *связь* между
+именем переменной и её значением. `const` присваивает значение `{}` переменной
+`foo` и гарантирует, что этой переменной больше не будет присвоено никаких
+других значений. Последующее использование [операторов присваивания][1], а также
+[унарных операторов][1] или [постфиксов][3] `--` и `++` вместе с этой
+переменной вызовет исключение `TypeError`:
 
     const foo = 27;
-    // Any of the following uncommented lines throws an exception.
-    // Assignment operators:
+    // Любая из следующих незакомментированных строк вызовет исключение.
+    // Операторы присваивания:
     foo = 42;
     foo *= 42;
     foo /= 42;
@@ -35,63 +38,66 @@ The only thing that’s immutable here is the *binding*. `const` assigns a value
     foo &= 0b101010;
     foo ^= 0b101010;
     foo |= 0b101010;
-    // Unary `--` and `++`:
+    // Унарные операторы `--` и `++`:
     --foo;
     ++foo;
-    // Postfix `--` and `++`:
+    // Постфиксы `--` и `++`:
     foo--;
     foo++;
 
-ES6 `const` has nothing to do with immutability of values.
+ES6 `const` не имеет ничего общего с иммутабельностью значений переменных.
 
-## So, how to make a value immutable?
+## И как тогда сделать значение иммутабельным?
 
-Primitive values, i.e. numbers, strings, booleans, symbols, `null`, or 
-`undefined`, are always immutable.
+Примитивы (числа, строки, логические значения, символы, а также `null` и
+`undefined`) всегда иммутабельны.
 
     var foo = 27;
     foo.bar = 42;
     console.log(foo.bar)
-    // → `undefined`
+    // → undefined
 
-To make an object immutable, use [`Object.freeze()`][4]. It has been around
-since ES5 and is widely available nowadays.
+Чтобы сделать иммутабельным объект, используйте [`Object.freeze()`][4]. Этот
+метод существует ещё со времён ES5 и хорошо поддерживается браузерами.
 
     const foo = Object.freeze({
       'bar': 27
     });
-    foo.bar = 42; // throws a TypeError exception in strict mode;
-                  // silently fails in sloppy mode
+    foo.bar = 42; // выбрасывает исключение TypeError в строгом режиме;
+                  // просто не работает в обычном режиме
     console.log(foo.bar);
     // → 27
 
-Note that `Object.freeze()` is shallow: object values within a frozen object (i
-.e. nested objects) can still be mutated.
-[The MDN entry on `Object.freeze()`][4] provides an example `deepFreeze()`
-implementation that can be used to make objects fully immutable.
+Обратите внимание на то, что `Object.freeze()` не поддерживает «глубокой
+заморозки» — свойства–объекты замороженного объекта всё ещё могут меняться.
+[В статье на MDN об `Object.freeze()`][4] приводится пример реализации функции
+`deepFreeze()`, делающей объект полностью иммутабельным.
+
+Возможно, иммутабельные структуры данных появятся в будущих версиях ECMAScript —
+такое предложение уже было внесено.
 
 ## `const` vs. `let`
 
-The only difference between `const` and `let` is that `const` makes the
-contract that no rebinding will happen.
+Единственное отличие `const` от `let` состоит в том, что `const` предотвращает
+повторное присваивание какого-либо значения.
 
-Everything I wrote here so far are facts. What follows is entirely subjective,
-but bear with me.
+Всё, что написано до этого предложения — факты. Всё написанное после него — моё
+субъективное мнение, но отнеситесь к нему с терпением.
 
-Given the above, `const` makes code easier to read: within its scope, a `const`
-`let` there is no such guarantee. As a result, it makes sense to use `let` and
-`const` as follows in your ES6 code:
+Учитывая вышесказанное, `const` делает код более читабельным: в своей области
+видимости `const`-переменная всегда ссылается на один и тот же объект. В случае
+с `let`-переменными такой уверенности быть уже не может. Поэтому я считаю важным
+использовать `let` и `const` в соответствии со следующими правилами:
 
-*   use `const` by default
-*   only use `let` if rebinding is needed
-*   (`var` shouldn’t be used in ES6)
+*   используйте `const` по умолчанию
+*   используйте `let`, если потребуется присвоить переменной другое значение
+*   (`var` не должно использоваться в ES6)
 
-Do you agree? Why (not)? I’m especially interested in hearing from developers
-who prefer`let` over `const` (i.e. even for variables that are never rebound).
-If you’re using`let` without rebinding, why are you using `let` in the first
-place? Is it because of the
-“`const` is for constants” misunderstanding, or is there another reason? Let
-me know in the comments!
+Согласны ли вы? Почему (нет)? Мне особенно интересно мнение разработиков,
+предпочитающих в первую очередь использовать `let` (даже если значение
+присваивается переменной только один раз). Почему вы предпочитаете использовать
+`let` вместо `const`? Это из-за заблуждения «`const` для констант» или по другой
+причине? Напишите в комментариях!
 
  [1]: https://tc39.github.io/ecma262/#sec-assignment-operators
  [2]: https://tc39.github.io/ecma262/#sec-unary-operators
