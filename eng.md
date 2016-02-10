@@ -1,3 +1,5 @@
+# ES6 const is not about immutability
+
 This seems to be a very common misconception that just won’t die. I keep
 running into it in blog posts, Twitter discussions, and even books. Here’s my 
 attempt at setting things straight.
